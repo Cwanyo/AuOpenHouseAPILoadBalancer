@@ -1,0 +1,42 @@
+{
+    "name": "auopenhouseapiloadbalancer",
+    "version": "1.0.0",
+    "description": "",
+    "main": "server.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "start": "nf start"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/Cwanyo/AuOpenHouseAPILoadBalancer.git"
+    },
+    "author": "Cwan",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/Cwanyo/AuOpenHouseAPILoadBalancer/issues"
+    },
+    "homepage": "https://github.com/Cwanyo/AuOpenHouseAPILoadBalancer#readme",
+    "devDependencies": {
+        "nodemon": "^1.12.1"
+    },
+    "dependencies": {
+        "body-parser": "^1.18.2",
+        "cookie-session": "^2.0.0-beta.3",
+        "cors": "^2.8.4",
+        "ejs": "^2.5.7",
+        "express": "^4.16.2",
+        "express-myconnection": "^1.0.4",
+        "express-mysql-session": "^2.0.1",
+        "express-session": "^1.15.6",
+        "express-validator": "^4.3.0",
+        "firebase-admin": "^5.4.3",
+        "foreman": "2.0.0",
+        "mysql": "^2.15.0",
+        "request": "^2.88.0"
+    },
+    "engines": {
+        "node": "8.4.0",
+        "npm": "5.3.0"
+    }
+}
