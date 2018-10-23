@@ -36,7 +36,7 @@ exports.user_monitor = (req, res, next) => {
     // Assign server to each user
     if (req.session.server == null) {
         req.session.server = slave_servers[current_server];
-        current_server = (current_server + 1) % servers.length;
+        current_server = (current_server + 1) % slave_servers.length;
     }
 
     next();
