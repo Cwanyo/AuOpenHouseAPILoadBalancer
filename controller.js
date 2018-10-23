@@ -26,7 +26,7 @@ exports.performance_monitor = (req, res, next) => {
 };
 
 exports.user_monitor = (req, res, next) => {
-
+    // Assign user number for debugging purpose
     if (req.session.user == null) {
         req.session.user = user_count;
         user_count++;
