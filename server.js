@@ -8,7 +8,7 @@ var express = require("express"),
 app.use(cors({ credentials: true, origin: true }));
 app.use(expressValidator());
 
-// app.set("trust proxy", 1);
+app.set("trust proxy", 1);
 
 // Cookie Session
 app.use(cookieSession({
