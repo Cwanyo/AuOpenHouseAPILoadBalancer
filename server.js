@@ -1,11 +1,11 @@
 var express = require("express"),
-    // cors = require("cors"),
+    cors = require("cors"),
     // expressValidator = require("express-validator"),
     cookieSession = require("cookie-session"),
     app = express(),
     port = process.env.PORT || 8080;
 
-// app.use(cors({ credentials: true, origin: true }));
+app.use(cors({ credentials: true, origin: true }));
 // app.use(expressValidator());
 
 // app.set("trust proxy", 1);
