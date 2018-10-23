@@ -1,6 +1,6 @@
 var express = require("express"),
-    cors = require("cors"),
-    expressValidator = require("express-validator"),
+    // cors = require("cors"),
+    // expressValidator = require("express-validator"),
     cookieSession = require("cookie-session"),
     app = express(),
     port = process.env.PORT || 8080;
@@ -11,10 +11,10 @@ var express = require("express"),
 // app.set("trust proxy", 1);
 
 // Cookie Session
-// app.use(cookieSession({
-//     secret: process.env.SECRET,
-//     maxAge: 60 * 60 * 1000 * 24 // <- hours session expire
-// }));
+app.use(cookieSession({
+    secret: process.env.SECRET,
+    maxAge: 60 * 60 * 1000 * 24 // <- hours session expire
+}));
 
 // Routes
 app.use("", require("./routes"));

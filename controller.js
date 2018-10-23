@@ -5,7 +5,7 @@ var request = require("request");
 // const servers = ["https://auopenhouse-00.herokuapp.com", "https://auopenhouse-01.herokuapp.com", "https://auopenhouse-02.herokuapp.com"];
 // const servers = ["http://localhost:3000", "https://auopenhouse.herokuapp.com"];
 // const servers = ["http://localhost:3000"];
-const servers = ["https://auopenhouse.herokuapp.com"];
+const servers = ["https://auopenhouse.herokuapp.com", "https://auopenhouse-00.herokuapp.com"];
 
 let cur = 0;
 
