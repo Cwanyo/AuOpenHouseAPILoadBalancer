@@ -14,7 +14,7 @@ router.route("/")
 router.use(contolller.performance_monitor);
 
 // All routes
-router.route("*")
+router.route("/*")
     .all(contolller.handler);
 
 module.exports = router;
