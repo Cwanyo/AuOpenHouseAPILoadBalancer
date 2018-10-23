@@ -1,39 +1,25 @@
 var express = require("express"),
-    request = require('request'),
-    cors = require('cors'),
-    path = require("path"),
-    bodyParser = require("body-parser"),
+    cors = require("cors"),
     expressValidator = require("express-validator"),
-    cookieSession = require('cookie-session'),
+    cookieSession = require("cookie-session"),
     app = express(),
     port = process.env.PORT || 8080;
 
-// app.set("view engine", "ejs");
-// app.set("views", path.join(__dirname, "views"));
+app.use(cors({ credentials: true, origin: true }));
+app.use(expressValidator());
 
-// app.use(express.static(path.join(__dirname, "public")));
-// app.use(cors({ credentials: true, origin: true }));
-// app.use(bodyParser.urlencoded({ extended: true }));
-// app.use(bodyParser.json());
-// app.use(expressValidator());
+app.set("trust proxy", 1);
 
-const servers = ['http://localhost:3000'];
-let cur = 0;
+// Cookie Session
+app.use(cookieSession({
+    secret: process.env.SECRET,
+    maxAge: 60 * 60 * 1000 * 24 // <- hours session expire
+}));
 
-// app.set("trust proxy", 1);
+// Routes
+app.use("", require("./routes"));
 
-const handler = (req, res) => {
-    console.log("Load-Balancer Passed at ", servers[cur], req.method, req.url);
-
-    const _req = request({ url: servers[cur] + req.url }).on('error', error => {
-        res.status(500).send(error.message);
-    });
-    req.pipe(_req).pipe(res);
-    cur = (cur + 1) % servers.length;
-};
-
-
-const server = express().all("*", handler);
-
-server.listen(port);
-console.log("AuOpenHouse Load Balancer started on port :: %s", port);
+// Start Server
+var server = app.listen(port, function() {
+    console.log("AuOpenHouse Load Balancer server started on port :: %s", server.address().port);
+});
