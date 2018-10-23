@@ -2,12 +2,12 @@
 
 var request = require("request");
 
-const servers = ["https://auopenhouse-00.herokuapp.com", "https://auopenhouse-01.herokuapp.com", "https://auopenhouse-02.herokuapp.com"];
-// const servers = ["http://localhost:3000", "https://auopenhouse.herokuapp.com"];
-// const servers = ["http://localhost:3000"];
-// const servers = ["https://auopenhouse.herokuapp.com", "https://auopenhouse-00.herokuapp.com"];
+// Master for Write Only
+const master_server = "https://auopenhouse-00.herokuapp.com";
+// Slave for Read Only
+const slave_servers = ["https://auopenhouse-01.herokuapp.com", "https://auopenhouse-02.herokuapp.com"];
 
-let cur = 0;
+let current_server = 0;
 let user_count = 0;
 
 exports.welcome_page = function(req, res, next) {
@@ -18,7 +18,7 @@ exports.performance_monitor = (req, res, next) => {
     // Show response time in millisecond
     const start = Date.now();
     res.on("finish", () => {
-        console.log("Load-Balancer Passed to | ", servers[cur], "|", req.method, req.url, "|", Date.now() - start, "ms");
+        console.log("Load-Balancer Passed to | ", req.session.server, "|", req.method, req.url, "|", Date.now() - start, "ms");
         console.log(req.session)
     });
 
@@ -32,14 +32,33 @@ exports.user_monitor = (req, res, next) => {
         user_count++;
     }
 
+    // TODO - check what if server down
+    // Assign server to each user
+    if (req.session.server == null) {
+        req.session.server = slave_servers[current_server];
+        current_server = (current_server + 1) % servers.length;
+    }
+
     next();
 };
 
-exports.handler = (req, res, next) => {
-    const _req = request({ url: servers[cur] + req.url }).on("error", error => {
+exports.load_balancer_read = (req, res, next) => {
+
+    // Get server from session
+    var user_server = req.session.server;
+
+    const _req = request({ url: user_server + req.url }).on("error", error => {
         res.status(503).send(error.message);
     });
     req.pipe(_req).pipe(res);
 
-    cur = (cur + 1) % servers.length;
+};
+
+exports.load_balancer_write = (req, res, next) => {
+
+    const _req = request({ url: master_server + req.url }).on("error", error => {
+        res.status(503).send(error.message);
+    });
+    req.pipe(_req).pipe(res);
+
 };
