@@ -33,6 +33,7 @@ exports.user_monitor = (req, res, next) => {
     }
 
     // TODO - check what if server down
+    // TODO - remove session after logout
     // Assign server to each user
     if (req.session.server == null) {
         req.session.server = slave_servers[current_server];
