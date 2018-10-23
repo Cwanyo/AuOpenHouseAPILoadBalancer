@@ -14,7 +14,7 @@ router.route("/")
 router.use(contolller.performance_monitor);
 
 // Middleware - Count user
-router.use(contolller.user_monitor);
+// router.use(contolller.user_monitor);
 
 // All routes
 router.route("/*")
