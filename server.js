@@ -12,7 +12,7 @@ app.use(expressValidator());
 
 // Cookie Session
 app.use(cookieSession({
-    name: 'sessionLB',
+    name: 'session_lb',
     secret: process.env.SECRET,
     maxAge: 60 * 60 * 1000 * 24 // <- hours session expire
 }));
