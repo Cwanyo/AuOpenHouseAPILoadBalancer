@@ -13,13 +13,25 @@ router.route("/")
 // Middleware - Performance monitor
 router.use(contolller.performance_monitor);
 
-// Middleware - Monitoring user
-router.use(contolller.user_monitor);
+// Middleware - Monitoring server
+router.use(contolller.server_monitor);
 
 // Set load balancer
-// Master for write only and Slave for read only
+// Read method for Slave
+// Authentication routes
+router.route("/api/student/login")
+    .post(contolller.load_balancer_read);
+router.route("/api/student/logout")
+    .delete(contolller.load_balancer_read);
+router.route("/api/authority/login")
+    .post(contolller.load_balancer_read);
+router.route("/api/authority/logout")
+    .delete(contolller.load_balancer_read);
 router.route("/*")
-    .get(contolller.load_balancer_read)
+    .get(contolller.load_balancer_read);
+
+// Write method for Master
+router.route("/*")
     .post(contolller.load_balancer_write)
     .put(contolller.load_balancer_write)
     .patch(contolller.load_balancer_write)
