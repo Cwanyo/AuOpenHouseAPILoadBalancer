@@ -48,37 +48,6 @@ exports.server_monitor = (req, res, next) => {
         req.session.user = user_count;
         user_count++;
     }
-
-    // Check server status
-    /*var c = 0;
-    var c_max = slave_servers.length;
-    var statusCode = 500;
-
-    (function check_server_status() {
-        // If c did not reach the maximum number of attempt
-        if (c <= c_max) {
-            if (statusCode >= 500) {
-                // Assign server to each user
-                if ((req.session.server == null) || (c != 0)) {
-                    req.session.server = assign_server();
-                }
-
-                request(req.session.server + "/test-connection", function(err, res, body) {
-                    c++;
-                    statusCode = res.statusCode;
-                    console.log("check_server_status:", c, "|", req.session.server, "|", statusCode);
-
-                    check_server_status();
-                });
-            } else if (statusCode < 500) {
-                next();
-            }
-        } else {
-            // If c reach the maximum number of attempt
-            console.log("check_server_status: maxout");
-            next();
-        }
-    }());*/
 };
 
 function assign_master_server() {
@@ -118,12 +87,13 @@ exports.load_balancer_read = (req, res, next) => {
                     check_server_status();
                 });
             } else if (statusCode < 500) {
-                next();
+                console.log("check_slave_server_status: connected");
+                // next();
             }
         } else {
             // If c reach the maximum number of attempt
             console.log("check_slave_server_status: maxout");
-            next();
+            // next();
         }
     }());
     
@@ -161,12 +131,13 @@ exports.load_balancer_write = (req, res, next) => {
                     check_server_status();
                 });
             } else if (statusCode < 500) {
-                next();
+                console.log("check_master_server_status: connected");
+                // next();
             }
         } else {
             // If c reach the maximum number of attempt
             console.log("check_master_server_status: maxout");
-            next();
+            // next();
         }
     }());
     
