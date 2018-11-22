@@ -13,9 +13,6 @@ router.route("/")
 // Middleware - Performance monitor
 router.use(contolller.performance_monitor);
 
-// Middleware - Monitoring server
-router.use(contolller.server_monitor);
-
 // Set load balancer
 // Read method for Slave
 // Authentication routes

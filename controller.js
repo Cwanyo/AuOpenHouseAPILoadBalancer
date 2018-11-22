@@ -4,8 +4,8 @@ var request = require("request");
 
 // Master for Write Only
 const master_servers = ["https://auopenhouse-00.herokuapp.com", "https://auopenhouse-0.herokuapp.com"]
-// Slave for Read Only
-// [server_url, status]
+    // Slave for Read Only
+    // [server_url, status]
 const slave_servers = ["https://auopenhouse-01.herokuapp.com", "https://auopenhouse-02.herokuapp.com"];
 
 // Spacial url that can passed to Slave
@@ -22,32 +22,33 @@ exports.welcome_page = function(req, res, next) {
 }
 
 exports.performance_monitor = (req, res, next) => {
-    // Show response time in millisecond
-    const start = Date.now();
-    res.on("finish", () => {
-
-        if (req.session == null) {
-            return;
-        }
-        // Get correct used server
-        /*var server = req.session.server;
-        if ((req.method != "GET") && (!spacial_read_url.includes(req.url))) {
-            server = master_server;
-        }
-
-        console.log("Load-Balancer passed | user:", req.session.user, "|", server, "|", req.method, req.url, "|", Date.now() - start, "ms");
-        console.log("Session:", req.session);*/
-    });
-
-    next();
-};
-
-exports.server_monitor = (req, res, next) => {
     // Assign user number for debugging purpose
     if (req.session.user == null) {
         req.session.user = user_count;
         user_count++;
     }
+
+    // Show response time in millisecond
+    const start = Date.now();
+
+    res.on("finish", () => {
+
+        if (req.session == null) {
+            return;
+        }
+
+        // Get correct used server
+        var server = req.session.slave_server;
+        if ((req.method != "GET") && (!spacial_read_url.includes(req.url))) {
+            server = req.session.master_server;
+        }
+
+        console.log(req.session);
+        console.log("Load-Balancer passed | user:", req.session.user, "|", server, "|", req.method, req.url, "|", Date.now() - start, "ms");
+        console.log("________________________________________________________________________________________________________________")
+    });
+
+    next();
 };
 
 function assign_master_server() {
@@ -82,30 +83,30 @@ exports.load_balancer_read = (req, res, next) => {
                 request(req.session.slave_server + "/test-connection", function(err, res, body) {
                     c++;
                     statusCode = res.statusCode;
-                    console.log("check_slave_server_status:", c, "|", req.session.slave_server, "|", statusCode);
+                    console.log("check_slave_server_status:", c, "time |", req.session.slave_server, "|", statusCode);
 
                     check_server_status();
                 });
             } else if (statusCode < 500) {
-                console.log("check_slave_server_status: connected");
-                // next();
+                // If connected then pass the request
+                console.log("check_slave_server_status:", req.session.slave_server, "=connected");
+
+                const _req = request({ url: req.session.slave_server + req.url }).on("error", error => {
+                    res.status(503).send(error.message);
+                });
+                req.pipe(_req).pipe(res);
+
+                // If user logout from api server, delete session_lb
+                if ((req.method == "DELETE") && (logout_url.includes(req.url))) {
+                    req.session = null;
+                }
             }
         } else {
             // If c reach the maximum number of attempt
             console.log("check_slave_server_status: maxout");
-            // next();
         }
     }());
-    
-    const _req = request({ url: req.session.slave_server + req.url }).on("error", error => {
-        res.status(503).send(error.message);
-    });
-    req.pipe(_req).pipe(res);
 
-    // If user logout from api server, delete session_lb
-    if ((req.method == "DELETE") && (logout_url.includes(req.url))) {
-        req.session = null;
-    }
 };
 
 exports.load_balancer_write = (req, res, next) => {
@@ -126,23 +127,23 @@ exports.load_balancer_write = (req, res, next) => {
                 request(req.session.master_server + "/test-connection", function(err, res, body) {
                     c++;
                     statusCode = res.statusCode;
-                    console.log("check_master_server_status:", c, "|", req.session.master_server, "|", statusCode);
+                    console.log("check_master_server_status:", c, "time |", req.session.master_server, "|", statusCode);
 
                     check_server_status();
                 });
             } else if (statusCode < 500) {
-                console.log("check_master_server_status: connected");
-                // next();
+                // If connected then pass the request
+                console.log("check_master_server_status:", req.session.master_server, "=connected");
+
+                const _req = request({ url: req.session.master_server + req.url }).on("error", error => {
+                    res.status(503).send(error.message);
+                });
+                req.pipe(_req).pipe(res);
             }
         } else {
             // If c reach the maximum number of attempt
             console.log("check_master_server_status: maxout");
-            // next();
         }
     }());
-    
-    const _req = request({ url: req.session.master_server + req.url }).on("error", error => {
-        res.status(503).send(error.message);
-    });
-    req.pipe(_req).pipe(res);
+
 };
