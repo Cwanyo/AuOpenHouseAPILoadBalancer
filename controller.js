@@ -69,7 +69,7 @@ function assign_slave_server() {
 exports.load_balancer_read = (req, res, next) => {
     // Check slave server status
     var c = 0;
-    var c_max = slave_servers.length;
+    var c_max = slave_servers.length * 2;
     var statusCode = 500;
 
     (function check_server_status() {
@@ -123,7 +123,7 @@ exports.load_balancer_read = (req, res, next) => {
 exports.load_balancer_write = (req, res, next) => {
     // Check master server status
     var c = 0;
-    var c_max = master_servers.length;
+    var c_max = master_servers.length * 2;
     var statusCode = 500;
 
     (function check_server_status() {
