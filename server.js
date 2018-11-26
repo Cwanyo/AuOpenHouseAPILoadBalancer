@@ -22,5 +22,6 @@ app.use("", require("./routes"));
 
 // Start Server
 var server = app.listen(port, function() {
+    console.log("========================================================================");
     console.log("AuOpenHouse Load Balancer server started on port :: %s", server.address().port);
 });
