@@ -84,13 +84,13 @@ exports.load_balancer_read = (req, res, next) => {
                 request(req.session.slave_server + "/test-connection", function(err, res, body) {
                     c++;
                     statusCode = res.statusCode;
-                    console.log("user_id:", req.session.user_id, "=> check_slave_server_status:", c, "time |", req.session.slave_server, "|", statusCode);
+                    console.log("--user_id:", req.session.user_id, "=> check_slave_server_status:", c, "time |", req.session.slave_server, "|", statusCode);
 
                     check_server_status();
                 });
             } else if (statusCode < 500) {
                 // If connected then pass the request
-                console.log("user_id:", req.session.user_id, "=> check_slave_server_status:", req.session.slave_server, "=connected");
+                console.log("--user_id:", req.session.user_id, "=> check_slave_server_status:", req.session.slave_server, "=connected");
 
                 const _req = request({ url: req.session.slave_server + req.url }).on("error", error => {
                     res.status(503).send(error.message);
@@ -98,6 +98,7 @@ exports.load_balancer_read = (req, res, next) => {
                 req.pipe(_req).pipe(res);
 
                 // Log
+                console.log("----------------------------------------------------------------------------------------------------------------")
                 console.log(req.session);
                 console.log("Load-Balancer passed | user_id:", req.session.user_id, "|", req.session.slave_server, "|", req.method, req.url);
                 console.log("________________________________________________________________________________________________________________")
@@ -109,7 +110,8 @@ exports.load_balancer_read = (req, res, next) => {
             }
         } else {
             // If c reach the maximum number of attempt
-            console.log("user_id:", req.session.user_id, "=> check_slave_server_status: maxout");
+            console.log("--user_id:", req.session.user_id, "=> check_slave_server_status: maxout");
+            console.log("----------------------------------------------------------------------------------------------------------------")
             console.log(req.session);
             console.log("________________________________________________________________________________________________________________")
             return res.sendStatus(503);
@@ -136,13 +138,13 @@ exports.load_balancer_write = (req, res, next) => {
                 request(req.session.master_server + "/test-connection", function(err, res, body) {
                     c++;
                     statusCode = res.statusCode;
-                    console.log("user_id:", req.session.user_id, "=> check_master_server_status:", c, "time |", req.session.master_server, "|", statusCode);
+                    console.log("--user_id:", req.session.user_id, "=> check_master_server_status:", c, "time |", req.session.master_server, "|", statusCode);
 
                     check_server_status();
                 });
             } else if (statusCode < 500) {
                 // If connected then pass the request
-                console.log("user_id:", req.session.user_id, "=> check_master_server_status:", req.session.master_server, "=connected");
+                console.log("--user_id:", req.session.user_id, "=> check_master_server_status:", req.session.master_server, "=connected");
 
                 const _req = request({ url: req.session.master_server + req.url }).on("error", error => {
                     res.status(503).send(error.message);
@@ -150,13 +152,15 @@ exports.load_balancer_write = (req, res, next) => {
                 req.pipe(_req).pipe(res);
 
                 // Log
+                console.log("----------------------------------------------------------------------------------------------------------------")
                 console.log(req.session);
                 console.log("Load-Balancer passed | user_id:", req.session.user_id, "|", req.session.slave_server, "|", req.method, req.url);
                 console.log("________________________________________________________________________________________________________________")
             }
         } else {
             // If c reach the maximum number of attempt
-            console.log("user_id:", req.session.user_id, "=> check_master_server_status: maxout");
+            console.log("--user_id:", req.session.user_id, "=> check_master_server_status: maxout");
+            console.log("----------------------------------------------------------------------------------------------------------------")
             console.log(req.session);
             console.log("________________________________________________________________________________________________________________")
             return res.sendStatus(503);
