@@ -25,30 +25,29 @@ exports.performance_monitor = (req, res, next) => {
     if (req.session.user_id == null) {
         // Random 20 characters of hex (1 byte = 2 hex characters)
         req.session.user_id = crypto.randomBytes(10).toString('hex');
-        console.log("===> Assigned user_id:", req.session.user_id);
+        console.log("===> Assigned new user_id:", req.session.user_id);
     }
 
-    // Show response time in millisecond
-    const start = Date.now();
+    // // Show response time in millisecond
+    // const start = Date.now();
 
-    res.on("finish", () => {
+    // res.on("finish", () => {
 
-        if (req.session == null) {
-            return;
-        }
+    //     if (req.session == null) {
+    //         return;
+    //     }
 
-        // Get correct used server
-        var server = req.session.slave_server;
-        if ((req.method != "GET") && (!spacial_read_url.includes(req.url))) {
-            server = req.session.master_server;
-        }
+    //     // Get correct used server
+    //     var server = req.session.slave_server;
+    //     if ((req.method != "GET") && (!spacial_read_url.includes(req.url))) {
+    //         server = req.session.master_server;
+    //     }
 
-        
-        console.log("----------------------------------------------------------------------------------------------------------------")
-        console.log(req.session);
-        console.log("Load-Balancer passed | user_id:", req.session.user_id, "|", server, "|", req.method, req.url, "|", Date.now() - start, "ms");
-        console.log("________________________________________________________________________________________________________________")
-    });
+    //     console.log("----------------------------------------------------------------------------------------------------------------")
+    //     console.log(req.session);
+    //     console.log("Load-Balancer passed | user_id:", req.session.user_id, "|", server, "|", req.method, req.url, "|", Date.now() - start, "ms");
+    //     console.log("________________________________________________________________________________________________________________")
+    // });
 
     next();
 };
@@ -68,8 +67,6 @@ function assign_slave_server() {
 }
 
 exports.load_balancer_read = (req, res, next) => {
-    
-    
     // Check slave server status
     var c = 0;
     var c_max = slave_servers.length;
@@ -93,25 +90,28 @@ exports.load_balancer_read = (req, res, next) => {
                 });
             } else if (statusCode < 500) {
                 // If connected then pass the request
-                console.log("check_slave_server_status:", req.session.slave_server, "=connected");
+                console.log("user_id:", req.session.user_id, "=> check_slave_server_status:", req.session.slave_server, "=connected");
 
                 const _req = request({ url: req.session.slave_server + req.url }).on("error", error => {
                     res.status(503).send(error.message);
                 });
                 req.pipe(_req).pipe(res);
 
+                // Log
+                console.log(req.session);
+                console.log("Load-Balancer passed | user_id:", req.session.user_id, "|", req.session.slave_server, "|", req.method, req.url);
+                console.log("________________________________________________________________________________________________________________")
+
                 // If user logout from api server, delete session_lb
                 if ((req.method == "DELETE") && (logout_url.includes(req.url))) {
-                    console.log(req.session);
-                    console.log("Load-Balancer passed | user_id:", req.session.user_id, "|", req.session.slave_server, "|", req.method, req.url);
-                    console.log("________________________________________________________________________________________________________________")
-                    
                     req.session = null;
                 }
             }
         } else {
             // If c reach the maximum number of attempt
-            console.log("check_slave_server_status: maxout");
+            console.log("user_id:", req.session.user_id, "=> check_slave_server_status: maxout");
+            console.log("________________________________________________________________________________________________________________")
+            return res.sendStatus(500);
         }
     }());
 
@@ -135,22 +135,29 @@ exports.load_balancer_write = (req, res, next) => {
                 request(req.session.master_server + "/test-connection", function(err, res, body) {
                     c++;
                     statusCode = res.statusCode;
-                    console.log("check_master_server_status:", c, "time |", req.session.master_server, "|", statusCode);
+                    console.log("user_id:", req.session.user_id, "=> check_master_server_status:", c, "time |", req.session.master_server, "|", statusCode);
 
                     check_server_status();
                 });
             } else if (statusCode < 500) {
                 // If connected then pass the request
-                console.log("check_master_server_status:", req.session.master_server, "=connected");
+                console.log("user_id:", req.session.user_id, "=> check_master_server_status:", req.session.master_server, "=connected");
 
                 const _req = request({ url: req.session.master_server + req.url }).on("error", error => {
                     res.status(503).send(error.message);
                 });
                 req.pipe(_req).pipe(res);
+
+                // Log
+                console.log(req.session);
+                console.log("Load-Balancer passed | user_id:", req.session.user_id, "|", req.session.slave_server, "|", req.method, req.url);
+                console.log("________________________________________________________________________________________________________________")
             }
         } else {
             // If c reach the maximum number of attempt
-            console.log("check_master_server_status: maxout");
+            console.log("user_id:", req.session.user_id, "=> check_master_server_status: maxout");
+            console.log("________________________________________________________________________________________________________________")
+            return res.sendStatus(500);
         }
     }());
 
