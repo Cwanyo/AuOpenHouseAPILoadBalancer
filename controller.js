@@ -23,8 +23,8 @@ exports.welcome_page = function(req, res, next) {
 exports.performance_monitor = (req, res, next) => {
     // Assign user id for debugging purpose
     if (req.session.user_id == null) {
-        // Random 40 characters of hex (1 byte = 2 hex characters)
-        req.session.user_id = crypto.randomBytes(20).toString('hex');
+        // Random 20 characters of hex (1 byte = 2 hex characters)
+        req.session.user_id = crypto.randomBytes(10).toString('hex');
         console.log("===> Assigned user_id:", req.session.user_id);
     }
 
@@ -43,6 +43,8 @@ exports.performance_monitor = (req, res, next) => {
             server = req.session.master_server;
         }
 
+        
+        console.log("----------------------------------------------------------------------------------------------------------------")
         console.log(req.session);
         console.log("Load-Balancer passed | user_id:", req.session.user_id, "|", server, "|", req.method, req.url, "|", Date.now() - start, "ms");
         console.log("________________________________________________________________________________________________________________")
@@ -85,7 +87,7 @@ exports.load_balancer_read = (req, res, next) => {
                 request(req.session.slave_server + "/test-connection", function(err, res, body) {
                     c++;
                     statusCode = res.statusCode;
-                    console.log("check_slave_server_status:", c, "time |", req.session.slave_server, "|", statusCode);
+                    console.log("user_id:", req.session.user_id, "=> check_slave_server_status:", c, "time |", req.session.slave_server, "|", statusCode);
 
                     check_server_status();
                 });
