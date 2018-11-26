@@ -101,6 +101,10 @@ exports.load_balancer_read = (req, res, next) => {
 
                 // If user logout from api server, delete session_lb
                 if ((req.method == "DELETE") && (logout_url.includes(req.url))) {
+                    console.log(req.session);
+                    console.log("Load-Balancer passed | user:", req.session.user, "|", req.session.slave_server, "|", req.method, req.url);
+                    console.log("________________________________________________________________________________________________________________")
+                    
                     req.session = null;
                 }
             }
