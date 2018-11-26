@@ -14,9 +14,7 @@ const spacial_read_url = ["/api/student/login", "/api/student/logout", "/api/aut
 const logout_url = ["/api/student/logout", "/api/authority/logout"]
 
 let current_master = 0;
-let current_slave = 0;
-
-// let user_count = 0;
+let current_slave = 0
 
 exports.welcome_page = function(req, res, next) {
     res.send("Welcome to AuOpenHouse Load Balancer");
@@ -25,10 +23,9 @@ exports.welcome_page = function(req, res, next) {
 exports.performance_monitor = (req, res, next) => {
     // Assign user id for debugging purpose
     if (req.session.user_id == null) {
-        const gen_id = crypto.randomBytes(20).toString('hex');
-        console.log("Assign user_id:", gen_id);
-        req.session.user_id = gen_id;
-//         user_count++;
+        // Random 40 characters of hex (1 byte = 2 hex characters)
+        req.session.user_id = crypto.randomBytes(20).toString('hex');
+        console.log("===> Assigned user_id:", req.session.user_id);
     }
 
     // Show response time in millisecond
