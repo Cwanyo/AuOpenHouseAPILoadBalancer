@@ -24,6 +24,7 @@ exports.welcome_page = function(req, res, next) {
 exports.performance_monitor = (req, res, next) => {
     // Assign user number for debugging purpose
     if (req.session.user == null || req.session.user > user_count) {
+        console.log("Assign user:", user_count);
         req.session.user = user_count;
         user_count++;
     }
@@ -66,6 +67,8 @@ function assign_slave_server() {
 }
 
 exports.load_balancer_read = (req, res, next) => {
+    
+    
     // Check slave server status
     var c = 0;
     var c_max = slave_servers.length;
