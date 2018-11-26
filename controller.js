@@ -23,7 +23,7 @@ exports.welcome_page = function(req, res, next) {
 
 exports.performance_monitor = (req, res, next) => {
     // Assign user number for debugging purpose
-    if (req.session == null) {
+    if (req.session.user == null || req.session.user > user_count) {
         req.session.user = user_count;
         user_count++;
     }
