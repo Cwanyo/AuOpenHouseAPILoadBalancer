@@ -1,6 +1,7 @@
 "use strict";
 
 var request = require("request");
+var crypto = require("crypto");
 
 // Master for Write Only
 const master_servers = ["https://auopenhouse-00.herokuapp.com", "https://auopenhouse-0.herokuapp.com"]
@@ -15,18 +16,19 @@ const logout_url = ["/api/student/logout", "/api/authority/logout"]
 let current_master = 0;
 let current_slave = 0;
 
-let user_count = 0;
+// let user_count = 0;
 
 exports.welcome_page = function(req, res, next) {
     res.send("Welcome to AuOpenHouse Load Balancer");
 }
 
 exports.performance_monitor = (req, res, next) => {
-    // Assign user number for debugging purpose
-    if (req.session.user == null || req.session.user > user_count) {
-        console.log("Assign user:", user_count);
-        req.session.user = user_count;
-        user_count++;
+    // Assign user id for debugging purpose
+    if (req.session.user_id == null) {
+        const gen_id = crypto.randomBytes(20).toString('hex');
+        console.log("Assign user_id:", gen_id);
+        req.session.user_id = gen_id;
+//         user_count++;
     }
 
     // Show response time in millisecond
@@ -45,7 +47,7 @@ exports.performance_monitor = (req, res, next) => {
         }
 
         console.log(req.session);
-        console.log("Load-Balancer passed | user:", req.session.user, "|", server, "|", req.method, req.url, "|", Date.now() - start, "ms");
+        console.log("Load-Balancer passed | user_id:", req.session.user_id, "|", server, "|", req.method, req.url, "|", Date.now() - start, "ms");
         console.log("________________________________________________________________________________________________________________")
     });
 
@@ -102,7 +104,7 @@ exports.load_balancer_read = (req, res, next) => {
                 // If user logout from api server, delete session_lb
                 if ((req.method == "DELETE") && (logout_url.includes(req.url))) {
                     console.log(req.session);
-                    console.log("Load-Balancer passed | user:", req.session.user, "|", req.session.slave_server, "|", req.method, req.url);
+                    console.log("Load-Balancer passed | user_id:", req.session.user_id, "|", req.session.slave_server, "|", req.method, req.url);
                     console.log("________________________________________________________________________________________________________________")
                     
                     req.session = null;
