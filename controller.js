@@ -111,7 +111,7 @@ exports.load_balancer_read = (req, res, next) => {
             // If c reach the maximum number of attempt
             console.log("user_id:", req.session.user_id, "=> check_slave_server_status: maxout");
             console.log("________________________________________________________________________________________________________________")
-            return res.sendStatus(500);
+            return res.sendStatus(503);
         }
     }());
 
@@ -157,7 +157,7 @@ exports.load_balancer_write = (req, res, next) => {
             // If c reach the maximum number of attempt
             console.log("user_id:", req.session.user_id, "=> check_master_server_status: maxout");
             console.log("________________________________________________________________________________________________________________")
-            return res.sendStatus(500);
+            return res.sendStatus(503);
         }
     }());
 
