@@ -8,6 +8,16 @@ Link to [report](docs/report.pdf)
 
 Load Balancing is created as a middle server to manage and distribute workloads among multiple RESTful web services servers
 
+The implementation of the load balancer is as follows:
+
+<p align="center">
+    <img src="docs/Load Balancer.png" height="750px">
+</p>
+
+# Architecture
+
+The overall architecture of the system is as follows:
+
 <p align="center">
     <img src="docs/System Architecture.png" height="750px">
 </p>
