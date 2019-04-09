@@ -11,7 +11,7 @@ Load Balancing is created as a middle server to manage and distribute workloads 
 The implementation of the load balancer is as follows:
 
 <p align="center">
-    <img src="docs/Load Balancer.png" height="750px">
+    <img src="docs/Load Balancer.png" height="450px">
 </p>
 
 # Architecture
